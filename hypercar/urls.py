@@ -18,7 +18,7 @@ from tickets.views import WelcomeView,menuView
 
 
 urlpatterns = [
-    # path('welcome/', WelcomeView.as_view()),
+    path('welcome/', WelcomeView.as_view()),
     path("menu/",menuView)
 
 ]
