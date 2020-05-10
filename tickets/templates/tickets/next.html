@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block container %}
+
+{% if size == 0 %}
+    <div>Waiting for the next client</div>
+{% else %}
+    <div>Next ticket #{{index}}</div>
+{% endif %}
+
+{% endblock %}

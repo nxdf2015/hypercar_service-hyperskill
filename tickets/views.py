@@ -1,6 +1,6 @@
 from django.views import View
 from django.http.response import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 
 from collections import deque,defaultdict
 from datetime import datetime,timedelta
@@ -9,21 +9,6 @@ class TicketQueue:
     queue=defaultdict(deque)
     index=0
     time={"change_oil":2 , "inflate_tires":5,"diagnostic":30}
-
-
-
-    def updateQueue(self,operation):
-        current_time=datetime.now()
-        queue=self.queue[operation]
-        delta=timedelta(minutes=self.time[operation])
-        if len(queue)>0:
-            while current_time - queue[0] > delta :
-                queue.popleft()
-
-    def update(self):
-        for operation in self.time.keys():
-            self.updateQueue(operation)
-
 
 
     def get_waiting(self,operation):
@@ -37,15 +22,32 @@ class TicketQueue:
             return waiting("change_oil") + waiting("inflate_tires")  + waiting(operation)
 
     def add(self,operation):
-        self.update()
+
         self.index+=1
         time_wait=self.get_waiting(operation)
-        self.queue[operation].append(datetime.now())
+        self.queue[operation].append(self.index)
+
         return (time_wait,self.index)
+
+    @classmethod
+    def size(cls):
+        return sum([ len(q) for q in cls.queue.values()])
+
+    @classmethod
+    def next(cls):
+        if cls.size() <  1:
+            return 0
+        if cls.queue["change_oil"]:
+            return cls.queue["change_oil"].popleft()
+        elif cls.queue["inflate_tires"]:
+            return cls.queue["inflate_tires"].popleft()
+        else:
+            return cls.queue["diagnostic"].popleft()
 
     @classmethod
     def get_count(cls):
         return { key : len(cls.queue[key]) for key in cls.time.keys()}
+
 
 
 
@@ -57,15 +59,24 @@ class WelcomeView(View):
 
 
 def menuView(request):
-    return render(request,"tickets/menu.html")
+    return render(request,"tickets/menu.html" )
 
+
+def nextView(request,index):
+    size=TicketQueue.size()
+    return render(request,"tickets/next.html",context={"size": size,"index":index})
 
 class TicketView(View):
     ticketqueue=TicketQueue()
     def get(self,request,*args,**kwargs):
         time,index = self.ticketqueue.add(kwargs["operation"])
 
-        return render(request,"tickets/tickets.html",context={"index":index,"time":time})
+        return render(request,"tickets/tickets.html",context={"queue":TicketQueue.queue,"index":index,"time":time})
 
-def processing_view(request):
-    return render(request,"tickets/processing.html",context=TicketQueue.get_count())
+class ProcessingView(View):
+
+    def get(self,request,*args,**kwargs):
+        return render(request,"tickets/processing.html",context=TicketQueue.get_count())
+
+    def post(self,request,*args,**kwargs):
+        return redirect("/next",index = TicketQueue.next())

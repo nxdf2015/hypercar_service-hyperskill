@@ -6,7 +6,7 @@ processing
 <div>Inflate tires queue: {{inflate_tires}}</div>
 <div>Get diagnostic queue: {{diagnostic}}</div>
 
-<form method="post">
+<form method="post" action="/processing">
     {% csrf_token %}
     <button type="submit">Process next</button>
 </form>
