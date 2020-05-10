@@ -43,7 +43,9 @@ class TicketQueue:
         self.queue[operation].append(datetime.now())
         return (time_wait,self.index)
 
-
+    @classmethod
+    def get_count(cls):
+        return { key : len(queue) for key,queue in cls.queue.items()}
 
 
 
@@ -65,4 +67,5 @@ class TicketView(View):
 
         return render(request,"tickets/tickets.html",context={"index":index,"time":time})
 
-
+def processing_view(request):
+    return render(request,"tickets/processing.html",context=TicketQueue.get_count())
