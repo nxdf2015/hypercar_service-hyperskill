@@ -45,7 +45,7 @@ class TicketQueue:
 
     @classmethod
     def get_count(cls):
-        return { key : len(queue) for key,queue in cls.queue.items()}
+        return { key : len(cls.queue[key]) for key in cls.time.keys()}
 
 
 

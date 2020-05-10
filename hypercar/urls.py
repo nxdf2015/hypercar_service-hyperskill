@@ -18,9 +18,9 @@ from tickets.views import WelcomeView,menuView,TicketView,processing_view
 
 
 urlpatterns = [
-    path('welcome/', WelcomeView.as_view()),
-    path("menu/",menuView),
-    path("processing/",processing_view),
+    path('welcome', WelcomeView.as_view()),
+    path("menu",menuView),
+    path("processing",processing_view),
     re_path(r"^get_ticket/(?P<operation>\w+)$",TicketView.as_view())
 
 ]

@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block container %}
+processing
+<div>Change oil queue: {{change_oil}}</div>
+<div>Inflate tires queue: {{inflate_tires}}</div>
+<div>Get diagnostic queue: {{diagnostic}}</div>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Process next</button>
+</form>
+{% endblock %}
